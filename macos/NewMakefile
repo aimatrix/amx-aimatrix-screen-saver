@@ -1,0 +1,47 @@
+# Fresh Makefile for Digital Rain Screen Saver
+
+TARGET = aimatrix
+BUNDLE_NAME = aimatrix-v5.16.saver
+SOURCES = AIMatrixView.m
+INSTALL_DIR = ~/Library/Screen\ Savers
+
+CC_FLAGS = -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -O2
+
+all: $(BUNDLE_NAME)
+
+$(BUNDLE_NAME): $(SOURCES) NewInfo.plist
+	@echo "Building AIMatrix Screen Saver..."
+	@mkdir -p $(BUNDLE_NAME)/Contents/MacOS
+	@mkdir -p $(BUNDLE_NAME)/Contents/Resources
+	
+	# Compile Objective-C files
+	clang $(CC_FLAGS) \
+		-bundle \
+		-o $(BUNDLE_NAME)/Contents/MacOS/$(TARGET) \
+		-framework ScreenSaver \
+		-framework Cocoa \
+		$(SOURCES)
+	
+	# Copy Info.plist
+	cp NewInfo.plist $(BUNDLE_NAME)/Contents/Info.plist
+	
+	# Copy preview image if exists
+	@if [ -f preview.png ]; then cp preview.png $(BUNDLE_NAME)/Contents/Resources/; fi
+	
+	@echo "Screen saver built successfully: $(BUNDLE_NAME)"
+
+install: $(BUNDLE_NAME)
+	@echo "Installing to $(INSTALL_DIR)..."
+	@mkdir -p $(INSTALL_DIR)
+	@echo "Cleaning up previous aimatrix versions..."
+	@rm -rf $(INSTALL_DIR)/aimatrix-v*.saver
+	@rm -rf $(INSTALL_DIR)/$(BUNDLE_NAME)
+	@cp -r $(BUNDLE_NAME) $(INSTALL_DIR)/
+	@echo "Installation complete!"
+	@echo "Go to System Preferences > Desktop & Screen Saver to activate"
+
+clean:
+	@rm -rf $(BUNDLE_NAME)
+	@echo "Cleaned build artifacts"
+
+.PHONY: all install clean

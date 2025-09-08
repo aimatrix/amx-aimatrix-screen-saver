@@ -1,0 +1,37 @@
+TARGET = SimpleScreenSaver
+BUNDLE_NAME = aimatrix-v5.13.saver
+SOURCES = SimpleTest.m
+INSTALL_DIR = ~/Library/Screen\ Savers
+
+CC_FLAGS = -arch arm64 -mmacosx-version-min=11.0 -O2
+
+all: $(BUNDLE_NAME)
+
+$(BUNDLE_NAME): $(SOURCES) SimpleInfo.plist
+	@echo "Building Simple Screen Saver..."
+	@mkdir -p $(BUNDLE_NAME)/Contents/MacOS
+	
+	# Compile without CFBundleExecutable - like Apple's screen savers
+	clang $(CC_FLAGS) \
+		-bundle \
+		-o $(BUNDLE_NAME)/Contents/MacOS/$(TARGET) \
+		-framework ScreenSaver \
+		-framework Cocoa \
+		$(SOURCES)
+	
+	# Copy Info.plist
+	cp SimpleInfo.plist $(BUNDLE_NAME)/Contents/Info.plist
+	
+	@echo "Screen saver built successfully: $(BUNDLE_NAME)"
+
+install: $(BUNDLE_NAME)
+	@echo "Installing to $(INSTALL_DIR)..."
+	@mkdir -p $(INSTALL_DIR)
+	@rm -rf $(INSTALL_DIR)/*.saver
+	@cp -r $(BUNDLE_NAME) $(INSTALL_DIR)/
+	@echo "Installation complete!"
+
+clean:
+	@rm -rf $(BUNDLE_NAME)
+
+.PHONY: all install clean

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Matrix Digital Rain Theme",
+  "version": "1.0.0",
+  "description": "Matrix-style digital rain theme with configurable colors using Greek characters",
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["matrix-rain.js"],
+      "css": ["matrix-rain.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Matrix Digital Rain Settings"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+*.saver/
+test_standalone
+test_window
+generate_preview
+*.dSYM/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Build artifacts
+*.o
+*.exe
+*.scr
+build/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+/tmp/
