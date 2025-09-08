@@ -26,8 +26,9 @@ $(BUNDLE_NAME): $(SOURCES) NewInfo.plist
 	# Copy Info.plist
 	cp NewInfo.plist $(BUNDLE_NAME)/Contents/Info.plist
 	
-	# Copy preview image if exists
-	@if [ -f preview.png ]; then cp preview.png $(BUNDLE_NAME)/Contents/Resources/; fi
+	# Copy thumbnail images for preview in System Settings
+	@if [ -f thumbnail.png ]; then cp thumbnail.png $(BUNDLE_NAME)/Contents/Resources/; fi
+	@if [ -f thumbnail@2x.png ]; then cp thumbnail@2x.png $(BUNDLE_NAME)/Contents/Resources/; fi
 	
 	# Sign the bundle with hardened runtime and entitlements
 	codesign --force --deep --strict --verbose \
