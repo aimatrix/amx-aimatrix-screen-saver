@@ -1,7 +1,7 @@
 # Makefile for Digital Rain Screen Saver (merged from NewMakefile)
 
 TARGET = aimatrix
-BUNDLE_NAME = aimatrix-v5.23.saver
+BUNDLE_NAME = aimatrix-v5.24.saver
 SOURCES = AIMatrixView.m
 INSTALL_DIR = ~/Library/Screen\ Savers
 CODESIGN_IDENTITY = "Apple Development: VINCENT LEE (5GKJMFZD6T)"
@@ -50,7 +50,7 @@ install: $(BUNDLE_NAME)
 	@cp -r $(BUNDLE_NAME) $(INSTALL_DIR)/
 	@echo "Installation complete!"
 	@echo "If System Settings is open, please quit it and reopen after install."
-	@echo "Go to System Settings > Screen Saver and pick 'aimatrix v5.23'"
+	@echo "Go to System Settings > Screen Saver and pick 'aimatrix v5.24'"
 
 uninstall:
 	@echo "Removing installed aimatrix screen savers..."

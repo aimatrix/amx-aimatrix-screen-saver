@@ -13,11 +13,11 @@
 	<key>CFBundleName</key>
 	<string>AIMatrix</string>
 	<key>CFBundleDisplayName</key>
-	<string>aimatrix v5.23</string>
+	<string>aimatrix v5.24</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>5.23</string>
+	<string>5.24</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSPrincipalClass</key>
