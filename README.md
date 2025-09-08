@@ -18,23 +18,43 @@ A beautiful Matrix-style digital rain screen saver collection for multiple platf
 ### Requirements
 - macOS 11.0 (Big Sur) or later
 - Works on macOS 15.6 (Sequoia) with proper code signing
+- Universal Binary (Intel & Apple Silicon M1/M2/M3)
 
 ### Quick Installation
 
-1. **Download the latest release**:
-   - Go to [Releases](https://github.com/yourusername/amx-aimatrix-screen-saver/releases)
-   - Download `aimatrix-v5.23.saver.zip`
-   - Unzip and double-click to install
+#### Option 1: Direct Download (Recommended)
 
-2. **Handle Security (if needed)**:
+1. **Download the latest release**:
+   - [⬇️ Download AIMatrix v5.24 for macOS](https://github.com/aimatrix/amx-aimatrix-screen-saver/raw/main/releases/aimatrix-v5.24.zip) (2.0 MB)
+   - Alternative: [Download from macos folder](https://github.com/aimatrix/amx-aimatrix-screen-saver/raw/main/macos/aimatrix-v5.24.zip)
+   - Or browse all versions in [releases folder](https://github.com/aimatrix/amx-aimatrix-screen-saver/tree/main/releases)
+
+2. **Install**:
+   - Unzip the downloaded file
+   - Double-click `aimatrix-v5.24.saver` to install
+   - Click "Install" when prompted
+
+#### Option 2: Manual Download from Repository
+
+1. Go to the [macos folder](https://github.com/aimatrix/amx-aimatrix-screen-saver/tree/main/macos)
+2. Click on `aimatrix-v5.24.zip`
+3. Click "Download" button
+4. Follow installation steps above
+
+### Post-Installation
+
+1. **Handle Security (if needed)**:
    - If macOS shows a security warning
    - Go to **System Settings > Privacy & Security**
    - Click "Allow Anyway" next to the aimatrix message
 
-3. **Activate the screen saver**:
-   - Open **System Settings > Screen Saver**
-   - Select "AIMatrix" or "aimatrix v5.23"
-   - Click "Options" to choose your color scheme
+2. **Activate the screen saver**:
+   - Open **System Settings > Screen Saver** (or **Lock Screen** on macOS Sequoia)
+   - Select "AIMatrix" or "aimatrix v5.24"
+   - Click "Options" to customize:
+     - 🎨 Color scheme (8 options)
+     - ⚡ Rain speed (4 levels)
+     - 📏 Character size (4 sizes)
 
 ### Build from Source
 
@@ -155,7 +175,12 @@ Created by Vincent Lee
 
 ## 📝 Version History
 
-- **v5.23** - Added 8 color schemes and configuration options
+- **v5.24** (Latest) - Performance optimizations, speed control, and character size options
+  - 90% memory reduction using C structs
+  - Dynamic FPS (20-60) based on speed setting
+  - 4 character sizes (Small/Medium/Large/Extra Large)
+  - 4 speed options (Slow/Normal/Fast/Very Fast)
+- **v5.23** - Added 8 color schemes and configuration dialog
 - **v5.22** - Hardened runtime for macOS Sequoia
 - **v5.21** - macOS 15.6 compatibility
 - **v5.20** - Code signing implementation
