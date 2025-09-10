@@ -4,12 +4,22 @@ TARGET = aimatrix
 VERSION = 7.2
 BUNDLE_NAME = aimatrix-v$(VERSION).saver
 SOURCES = AIMatrixView.m
+
+# GPU Version 8.0 Configuration
+GPU_TARGET = aimatrix-gpu
+GPU_VERSION = 8.0
+GPU_BUNDLE_NAME = aimatrix-gpu-v$(GPU_VERSION).saver
+GPU_SOURCES = AIMatrixGPUView.m
+
 INSTALL_DIR = ~/Library/Screen\ Savers
 CODESIGN_IDENTITY = "Apple Development: VINCENT LEE (5GKJMFZD6T)"
 
 CC_FLAGS = -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -O2 -fobjc-arc
 
 all: $(BUNDLE_NAME)
+
+# GPU-accelerated version target
+gpu: $(GPU_BUNDLE_NAME)
 
 $(BUNDLE_NAME): $(SOURCES) NewInfo.plist
 	@echo "Building AIMatrix Screen Saver..."
@@ -42,6 +52,42 @@ $(BUNDLE_NAME): $(SOURCES) NewInfo.plist
 	
 	@echo "Screen saver built and signed successfully: $(BUNDLE_NAME)"
 
+# GPU Version 8.0 Build Rule
+$(GPU_BUNDLE_NAME): $(GPU_SOURCES) InfoGPU.plist
+	@echo "Building AIMatrix GPU Screen Saver v$(GPU_VERSION)..."
+	@mkdir -p $(GPU_BUNDLE_NAME)/Contents/MacOS
+	@mkdir -p $(GPU_BUNDLE_NAME)/Contents/Resources
+	
+	# Compile GPU version with Metal frameworks
+	clang $(CC_FLAGS) \
+		-bundle \
+		-o $(GPU_BUNDLE_NAME)/Contents/MacOS/$(GPU_TARGET) \
+		-framework ScreenSaver \
+		-framework Cocoa \
+		-framework QuartzCore \
+		-framework Metal \
+		-framework MetalKit \
+		-framework CoreText \
+		$(GPU_SOURCES)
+	
+	# Copy GPU Info.plist
+	cp InfoGPU.plist $(GPU_BUNDLE_NAME)/Contents/Info.plist
+	
+	# Copy thumbnail images for preview in System Settings
+	@if [ -f thumbnail.png ]; then cp thumbnail.png $(GPU_BUNDLE_NAME)/Contents/Resources/; fi
+	@if [ -f thumbnail@2x.png ]; then cp thumbnail@2x.png $(GPU_BUNDLE_NAME)/Contents/Resources/; fi
+	
+	# Sign the GPU bundle with hardened runtime and entitlements
+	codesign --force --deep --strict --verbose \
+		--sign $(CODESIGN_IDENTITY) \
+		--entitlements ScreenSaver.entitlements \
+		--options runtime \
+		--timestamp \
+		$(GPU_BUNDLE_NAME)
+	
+	@echo "GPU Screen saver built and signed successfully: $(GPU_BUNDLE_NAME)"
+	@echo "This version uses TRUE GPU acceleration with Metal for ultra-smooth 60 FPS!"
+
 install: $(BUNDLE_NAME)
 	@echo "Installing to $(INSTALL_DIR)..."
 	@mkdir -p $(INSTALL_DIR)
@@ -55,6 +101,21 @@ install: $(BUNDLE_NAME)
 	@echo "If System Settings is open, please quit it and reopen after install."
 	@echo "Go to System Settings > Screen Saver and pick 'aimatrix-v$(VERSION)'"
 
+# GPU Version Install
+install-gpu: $(GPU_BUNDLE_NAME)
+	@echo "Installing GPU version to $(INSTALL_DIR)..."
+	@mkdir -p $(INSTALL_DIR)
+	@echo "Cleaning up ALL previous versions..."
+	@rm -rf $(INSTALL_DIR)/aimatrix*.saver
+	@rm -rf $(INSTALL_DIR)/AIMatrix*.saver
+	@rm -rf /Library/Screen\ Savers/aimatrix*.saver || true
+	@rm -rf /Library/Screen\ Savers/AIMatrix*.saver || true
+	@cp -r $(GPU_BUNDLE_NAME) $(INSTALL_DIR)/
+	@echo "GPU Installation complete!"
+	@echo "If System Settings is open, please quit it and reopen after install."
+	@echo "Go to System Settings > Screen Saver and pick 'AIMatrix GPU v$(GPU_VERSION)'"
+	@echo "This version uses TRUE GPU acceleration with Metal!"
+
 uninstall:
 	@echo "Removing installed aimatrix screen savers..."
 	@rm -rf $(INSTALL_DIR)/aimatrix-v*.saver
@@ -63,6 +124,7 @@ uninstall:
 
 clean:
 	@rm -rf $(BUNDLE_NAME)
+	@rm -rf $(GPU_BUNDLE_NAME)
 	@rm -rf *.saver
 	@echo "Cleaned build artifacts"
 
@@ -149,4 +211,4 @@ install-variants: AIMatrixVariants.saver
 	@echo "AIMatrix Variants installed!"
 	@echo "Go to System Settings > Screen Saver and select 'AIMatrix Variants'"
 
-.PHONY: all install uninstall clean install-test install-variants
+.PHONY: all gpu install install-gpu uninstall clean install-test install-variants

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.aimatrix.screensaver.gpu</string>
+    <key>CFBundleName</key>
+    <string>AIMatrix GPU v8.0</string>
+    <key>CFBundleDisplayName</key>
+    <string>AIMatrix GPU v8.0</string>
+    <key>CFBundleVersion</key>
+    <string>8.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>8.0</string>
+    <key>NSPrincipalClass</key>
+    <string>AIMatrixGPUView</string>
+    <key>CFBundlePackageType</key>
+    <string>BNDL</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>© 2024 AIMatrix. GPU-accelerated Matrix screen saver.</string>
+    <key>CFBundleExecutable</key>
+    <string>aimatrix-gpu</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+    <key>LSRequiresNativeExecution</key>
+    <true/>
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.entertainment</string>
+    <key>CFBundleDescription</key>
+    <string>AIMatrix Screen Saver v8.0 - True GPU acceleration with Metal for ultra-smooth 60 FPS matrix rain effect displaying "aimatrix.com - the agentic twin platform...."</string>
+</dict>
+</plist>
