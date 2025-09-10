@@ -13,13 +13,13 @@
 	<key>CFBundleName</key>
 	<string>AIMatrix</string>
 	<key>CFBundleDisplayName</key>
-	<string>AIMatrix Fixed Independent</string>
+	<string>AIMatrix - Agentic Twin Platform</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>10.0</string>
+	<string>7.0</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>7.0</string>
 	<key>NSPrincipalClass</key>
 	<string>AIMatrixView</string>
 	<key>LSMinimumSystemVersion</key>

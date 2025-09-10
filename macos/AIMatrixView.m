@@ -36,7 +36,7 @@
         for (int i = 0; i < numColumns; i++) {
             NSMutableDictionary *column = [NSMutableDictionary dictionary];
             column[@"x"] = @(i * columnWidth);
-            column[@"y"] = @(arc4random_uniform((int)frame.size.height));
+            column[@"y"] = @(-arc4random_uniform(500)); // Start above the screen
             column[@"length"] = @(5 + arc4random_uniform(20));
             column[@"speed"] = @(50 + arc4random_uniform(100)); // pixels per second
             column[@"lastUpdate"] = @(CACurrentMediaTime());
@@ -49,10 +49,11 @@
 
 - (NSMutableArray *)generateRandomChars:(int)length {
     NSMutableArray *chars = [NSMutableArray array];
-    NSString *charset = @"ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789";
+    NSString *text = @"aimatrix.com - the agentic twin platform ";
     
+    // Fill the array with characters from the text, repeating as needed
     for (int i = 0; i < length; i++) {
-        unichar c = [charset characterAtIndex:arc4random_uniform((uint32_t)charset.length)];
+        unichar c = [text characterAtIndex:(i % text.length)];
         [chars addObject:[NSString stringWithCharacters:&c length:1]];
     }
     return chars;
@@ -72,8 +73,8 @@
         
         // Draw characters in the column
         for (int i = 0; i < length; i++) {
-            // Calculate position (trail extends upward from head)
-            float charY = y - (i * charHeight);
+            // Calculate position (trail extends downward behind head)
+            float charY = y + (i * charHeight);
             
             // Skip if off screen
             if (charY < -charHeight || charY > rect.size.height) continue;
@@ -115,8 +116,8 @@
         // Move down smoothly based on time
         y += speed * deltaTime;
         
-        // Reset when off screen
-        if (y - ([column[@"length"] intValue] * charHeight) > self.bounds.size.height) {
+        // Reset when the head goes off screen at the bottom
+        if (y > self.bounds.size.height) {
             y = -arc4random_uniform(500);
             column[@"length"] = @(5 + arc4random_uniform(20));
             column[@"speed"] = @(50 + arc4random_uniform(100));
@@ -126,15 +127,7 @@
         column[@"y"] = @(y);
         column[@"lastUpdate"] = @(currentTime);
         
-        // Randomly change a character
-        if (arc4random_uniform(100) < 10) {
-            NSMutableArray *chars = [column[@"chars"] mutableCopy];
-            int idx = arc4random_uniform((uint32_t)chars.count);
-            NSString *charset = @"ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789";
-            unichar c = [charset characterAtIndex:arc4random_uniform((uint32_t)charset.length)];
-            chars[idx] = [NSString stringWithCharacters:&c length:1];
-            column[@"chars"] = chars;
-        }
+        // No need to randomly change characters since we're showing specific text
     }
     
     [self setNeedsDisplay:YES];
