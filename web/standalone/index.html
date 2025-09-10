@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Matrix Digital Rain Screen Saver</title>
+    
+    <!-- Web App Configuration -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Matrix Rain">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Prevent caching for dynamic content -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- Security -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="matrix-engine.js" as="script">
+    <link rel="preload" href="../canvas/matrix-drop-algorithm.js" as="script">
+    <link rel="preload" href="../canvas/fullscreen-manager.js" as="script">
+    <link rel="preload" href="../canvas/multi-display-manager.js" as="script">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="matrix-logo">
+                <div class="matrix-text">MATRIX</div>
+                <div class="loading-animation">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+            <p class="loading-message">Initializing Digital Rain...</p>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div id="main-container" class="main-container hidden">
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-brand">
+                <h1>Matrix Digital Rain</h1>
+            </div>
+            <div class="nav-controls">
+                <button id="fullscreen-btn" class="nav-btn" title="Toggle Fullscreen">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                    </svg>
+                </button>
+                <button id="multi-display-btn" class="nav-btn" title="Multi-Display Mode">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 2v1h8v-1l-2-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/>
+                    </svg>
+                </button>
+                <button id="settings-btn" class="nav-btn" title="Settings">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Main Screen Saver Area -->
+        <main class="screensaver-main">
+            <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
+            
+            <!-- Overlay Controls -->
+            <div class="overlay-controls" id="overlay-controls">
+                <div class="control-group">
+                    <button id="start-btn" class="control-btn primary">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        Start Rain
+                    </button>
+                    <button id="stop-btn" class="control-btn secondary hidden">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M6 6h12v12H6z"/>
+                        </svg>
+                        Stop Rain
+                    </button>
+                </div>
+                
+                <div class="quick-settings">
+                    <div class="setting-item">
+                        <label>Color:</label>
+                        <input type="color" id="color-picker" value="#00ff00">
+                    </div>
+                    <div class="setting-item">
+                        <label>Speed:</label>
+                        <input type="range" id="speed-slider" min="50" max="500" value="100">
+                    </div>
+                    <div class="setting-item">
+                        <label>Opacity:</label>
+                        <input type="range" id="opacity-slider" min="0.05" max="1.0" step="0.05" value="0.1">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Info -->
+            <div class="performance-info" id="performance-info">
+                <div class="perf-item">FPS: <span id="fps-counter">60</span></div>
+                <div class="perf-item">Drops: <span id="drop-counter">0</span></div>
+                <div class="perf-item">Memory: <span id="memory-counter">0MB</span></div>
+            </div>
+            
+            <!-- Instructions Overlay -->
+            <div class="instructions-overlay" id="instructions-overlay">
+                <div class="instructions-content">
+                    <h3>Matrix Digital Rain</h3>
+                    <p>Press <strong>F11</strong> or click <strong>Fullscreen</strong> for the best experience</p>
+                    <p>Use the controls to customize colors and effects</p>
+                    <p><em>Press Escape or click to hide this message</em></p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="modal-close" id="close-settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <h4>Visual Effects</h4>
+                        
+                        <div class="setting-row">
+                            <label for="font-size">Font Size:</label>
+                            <div class="range-input">
+                                <input type="range" id="font-size" min="10" max="32" step="2" value="16">
+                                <span class="range-value">16px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <label for="trail-length">Trail Length:</label>
+                            <div class="range-input">
+                                <input type="range" id="trail-length" min="5" max="50" step="5" value="25">
+                                <span class="range-value">25</span>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <label>Character Set:</label>
+                            <select id="character-set">
+                                <option value="mixed">Greek + Latin + Numbers</option>
+                                <option value="greek">Greek Only</option>
+                                <option value="latin">Latin Only</option>
+                                <option value="numbers">Numbers Only</option>
+                                <option value="symbols">Symbols Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Performance</h4>
+                        
+                        <div class="setting-row">
+                            <label>Quality Level:</label>
+                            <select id="quality-level">
+                                <option value="auto">Auto (Recommended)</option>
+                                <option value="low">Low (Better Performance)</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="ultra">Ultra (Best Quality)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="show-performance">
+                                <span class="checkmark"></span>
+                                Show Performance Info
+                            </label>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="reduce-motion" checked>
+                                <span class="checkmark"></span>
+                                Respect Reduced Motion Preference
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Behavior</h4>
+                        
+                        <div class="setting-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="auto-fullscreen">
+                                <span class="checkmark"></span>
+                                Auto-enter Fullscreen
+                            </label>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="hide-cursor" checked>
+                                <span class="checkmark"></span>
+                                Hide Cursor in Fullscreen
+                            </label>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="keyboard-shortcuts" checked>
+                                <span class="checkmark"></span>
+                                Enable Keyboard Shortcuts
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="reset-settings" class="btn secondary">Reset to Defaults</button>
+                <button id="save-settings" class="btn primary">Save Settings</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Multi-Display Modal -->
+    <div id="multi-display-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Multi-Display Setup</h3>
+                <button class="modal-close" id="close-multi-display">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="display-list" class="display-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="open-all-displays" class="btn primary">Open on All Displays</button>
+                <button id="close-all-displays" class="btn secondary">Close All Windows</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script type="module" src="../canvas/matrix-drop-algorithm.js"></script>
+    <script type="module" src="../canvas/fullscreen-manager.js"></script>
+    <script type="module" src="../canvas/multi-display-manager.js"></script>
+    <script type="module" src="matrix-engine.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

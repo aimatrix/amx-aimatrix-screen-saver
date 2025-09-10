@@ -7,26 +7,30 @@
 	<key>CFBundleExecutable</key>
 	<string>aimatrix</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aimatrix.fixed.1757365272</string>
+	<string>com.aimatrix.fresh.1757364935</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>10.0</string>
+	<string>9.0</string>
 	<key>CFBundleName</key>
-	<string>AIMatrix</string>
+	<string>AIMatrix Fresh Build</string>
 	<key>CFBundleDisplayName</key>
-	<string>AIMatrix Fixed Independent</string>
+	<string>AIMatrix Fresh Build</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>10.0</string>
+	<string>9.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSPrincipalClass</key>
-	<string>AIMatrixView</string>
+	<string>aimatrix.AIMatrixSceneKitView</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>11.0</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
 	</array>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2024 AIMatrix. All rights reserved.</string>
+	<key>NSScreenSaverCanRunOverLoginWindow</key>
+	<true/>
 </dict>
 </plist>

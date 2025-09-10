@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Rain Screen Saver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            cursor: none;
+        }
+        
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+        
+        .exit-hint {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: rgba(0, 255, 0, 0.3);
+            font-size: 12px;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .exit-hint.visible {
+            opacity: 1;
+        }
+        
+        .performance-info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: rgba(0, 255, 0, 0.5);
+            font-size: 11px;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            font-family: monospace;
+        }
+        
+        .performance-info.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    
+    <div class="exit-hint" id="exit-hint">
+        Press any key or move mouse to exit
+    </div>
+    
+    <div class="performance-info" id="performance-info">
+        <div id="fps-counter">FPS: --</div>
+        <div id="drop-count">Drops: --</div>
+        <div id="memory-usage">Memory: --</div>
+    </div>
+    
+    <script>
+        // Import the Matrix Drop Algorithm
+        // Since we're in Electron, we can use ES modules or require
+        // For now, we'll inline the Matrix algorithm with Electron-specific optimizations
+        
+        class ElectronMatrixDrop {
+            constructor(x, fontSize, canvasHeight, characters) {
+                this.x = x;
+                this.fontSize = fontSize;
+                this.canvasHeight = canvasHeight;
+                this.characters = characters;
+                
+                this.reset();
+                
+                // Electron-specific optimizations
+                this.lastRenderTime = 0;
+                this.renderThrottle = 16.67; // 60fps target
+            }
+            
+            reset() {
+                this.y = -this.fontSize * (1 + Math.random() * 20);
+                this.speed = 0.5 + Math.random() * 2.5;
+                this.length = 8 + Math.floor(Math.random() * 18);
+                this.sequence = this.generateSequence();
+                this.headIndex = 0;
+                this.opacity = 1;
+                this.isActive = true;
+                this.lastCharChange = 0;
+                this.charChangeInterval = 100 + Math.random() * 200;
+            }
+            
+            generateSequence() {
+                const sequence = [];
+                for (let i = 0; i < this.length; i++) {
+                    sequence.push({
+                        char: this.getRandomCharacter(),
+                        lastChange: 0,
+                        changeInterval: 100 + Math.random() * 300
+                    });
+                }
+                return sequence;
+            }
+            
+            getRandomCharacter() {
+                return this.characters[Math.floor(Math.random() * this.characters.length)];
+            }
+            
+            update(currentTime, deltaTime) {
+                if (!this.isActive) return;
+                
+                // Update position
+                this.y += this.speed * (deltaTime / 16.67);
+                
+                // Update character sequence
+                if (currentTime - this.lastCharChange > this.charChangeInterval) {
+                    this.updateCharacters(currentTime);
+                    this.lastCharChange = currentTime;
+                }
+                
+                // Check if off screen
+                if (this.y > this.canvasHeight + this.fontSize * this.length) {
+                    this.reset();
+                }
+                
+                // Handle fading
+                const fadeZone = this.canvasHeight * 0.9;
+                if (this.y > fadeZone) {
+                    this.opacity = Math.max(0, 1 - ((this.y - fadeZone) / (this.canvasHeight * 0.1)));
+                } else {
+                    this.opacity = 1;
+                }
+            }
+            
+            updateCharacters(currentTime) {
+                for (let i = 0; i < this.sequence.length; i++) {
+                    const char = this.sequence[i];
+                    if (currentTime - char.lastChange > char.changeInterval) {
+                        const distanceFromHead = Math.abs(i - this.headIndex);
+                        const changeProbability = Math.max(0.1, 1 - (distanceFromHead / this.length));
+                        
+                        if (Math.random() < changeProbability) {
+                            char.char = this.getRandomCharacter();
+                            char.lastChange = currentTime;
+                            char.changeInterval = 100 + Math.random() * 300;
+                        }
+                    }
+                }
+                
+                this.headIndex = (this.headIndex + 1) % this.length;
+            }
+            
+            render(ctx, color, currentTime) {
+                if (!this.isActive) return;
+                
+                // Throttle rendering for performance
+                if (currentTime - this.lastRenderTime < this.renderThrottle) return;
+                this.lastRenderTime = currentTime;
+                
+                ctx.font = `${this.fontSize}px 'Courier New', monospace`;
+                
+                for (let i = 0; i < this.sequence.length; i++) {
+                    const char = this.sequence[i];
+                    const charY = this.y - (i * this.fontSize);
+                    
+                    // Skip if off-screen
+                    if (charY < -this.fontSize || charY > ctx.canvas.height + this.fontSize) {
+                        continue;
+                    }
+                    
+                    // Calculate opacity
+                    let charOpacity = this.opacity;
+                    if (i === this.headIndex) {
+                        charOpacity *= 1.0;
+                    } else {
+                        const distanceFromHead = (i - this.headIndex + this.length) % this.length;
+                        charOpacity *= Math.max(0.1, 1 - (distanceFromHead / this.length) * 0.8);
+                    }
+                    
+                    // Render character
+                    const alpha = Math.round(charOpacity * 255).toString(16).padStart(2, '0');
+                    ctx.fillStyle = color + alpha;
+                    ctx.fillText(char.char, this.x, charY);
+                }
+            }
+        }
+        
+        class ElectronMatrixScreenSaver {
+            constructor() {
+                this.canvas = document.getElementById('matrix-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.drops = [];
+                this.isRunning = false;
+                this.animationId = null;
+                
+                // Performance monitoring
+                this.fps = 0;
+                this.frameCount = 0;
+                this.lastFpsTime = 0;
+                this.performanceInfo = document.getElementById('performance-info');
+                this.fpsCounter = document.getElementById('fps-counter');
+                this.dropCounter = document.getElementById('drop-count');
+                this.memoryCounter = document.getElementById('memory-usage');
+                
+                // Default settings
+                this.settings = {
+                    color: '#00ff00',
+                    fontSize: 16,
+                    speed: 100,
+                    opacity: 0.1,
+                    exitOnActivity: true
+                };
+                
+                // Character sets
+                this.characters = [];
+                
+                this.setupCanvas();
+                this.setupEventListeners();
+                this.setupPerformanceMonitoring();
+                
+                // Wait for Electron initialization
+                this.waitForElectron();
+            }
+            
+            async waitForElectron() {
+                if (typeof window.electronAPI !== 'undefined') {
+                    this.initializeElectron();
+                } else {
+                    setTimeout(() => this.waitForElectron(), 100);
+                }
+            }
+            
+            initializeElectron() {
+                // Setup Electron event listeners
+                window.electronAPI.onScreenSaverInit((data) => {
+                    this.settings = { ...this.settings, ...data.settings };
+                    this.displayInfo = data.display;
+                    this.displayId = data.displayId;
+                    
+                    this.loadCharacters();
+                    this.start();
+                });
+                
+                window.electronAPI.onSettingsUpdate((settings) => {
+                    this.settings = { ...this.settings, ...settings };
+                    this.updateDisplay();
+                });
+                
+                // Load default character set
+                this.loadCharacters();
+            }
+            
+            loadCharacters() {
+                if (typeof window.matrixUtils !== 'undefined') {
+                    this.characters = [
+                        ...window.matrixUtils.characters.greek,
+                        ...window.matrixUtils.characters.latin,
+                        ...window.matrixUtils.characters.numbers
+                    ];
+                } else {
+                    // Fallback character set
+                    this.characters = [
+                        'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η', 'Θ', 'Ι', 'Κ', 'Λ', 'Μ',
+                        'Ν', 'Ξ', 'Ο', 'Π', 'Ρ', 'Σ', 'Τ', 'Υ', 'Φ', 'Χ', 'Ψ', 'Ω',
+                        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                        'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+                    ];
+                }
+            }
+            
+            setupCanvas() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.initializeDrops();
+            }
+            
+            initializeDrops() {
+                this.drops = [];
+                const columns = Math.floor(this.canvas.width / this.settings.fontSize);
+                const maxDrops = columns * 2; // Allow overlapping
+                
+                for (let i = 0; i < maxDrops; i++) {
+                    const column = i % columns;
+                    const x = column * this.settings.fontSize + (Math.random() * this.settings.fontSize * 0.3);
+                    const drop = new ElectronMatrixDrop(x, this.settings.fontSize, this.canvas.height, this.characters);
+                    drop.y = -Math.random() * this.canvas.height;
+                    this.drops.push(drop);
+                }
+            }
+            
+            setupEventListeners() {
+                // Activity detection for exit
+                if (this.settings.exitOnActivity) {
+                    let activityTimeout;
+                    
+                    const onActivity = () => {
+                        if (this.isRunning) {
+                            // Show exit hint briefly
+                            const exitHint = document.getElementById('exit-hint');
+                            exitHint.classList.add('visible');
+                            
+                            clearTimeout(activityTimeout);
+                            activityTimeout = setTimeout(() => {
+                                exitHint.classList.remove('visible');
+                                this.exitScreenSaver();
+                            }, 500);
+                        }
+                    };
+                    
+                    document.addEventListener('mousemove', onActivity);
+                    document.addEventListener('keydown', onActivity);
+                    document.addEventListener('click', onActivity);
+                }
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                        // Toggle performance info
+                        this.performanceInfo.classList.toggle('visible');
+                        e.preventDefault();
+                    }
+                    
+                    if (e.key === 'Escape') {
+                        this.exitScreenSaver();
+                    }
+                });
+            }
+            
+            setupPerformanceMonitoring() {
+                setInterval(() => {
+                    this.updatePerformanceInfo();
+                }, 1000);
+            }
+            
+            updatePerformanceInfo() {
+                // Update FPS
+                this.fpsCounter.textContent = `FPS: ${this.fps}`;
+                
+                // Update drop count
+                this.dropCounter.textContent = `Drops: ${this.drops.length}`;
+                
+                // Update memory usage
+                if (typeof window.matrixUtils !== 'undefined') {
+                    const perfInfo = window.matrixUtils.getPerformanceInfo();
+                    const memoryMB = (perfInfo.memory.used / 1024 / 1024).toFixed(1);
+                    this.memoryCounter.textContent = `Memory: ${memoryMB}MB`;
+                }
+            }
+            
+            start() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.lastTime = performance.now();
+                this.animate();
+            }
+            
+            stop() {
+                if (!this.isRunning) return;
+                
+                this.isRunning = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+            }
+            
+            animate() {
+                if (!this.isRunning) return;
+                
+                const currentTime = performance.now();
+                const deltaTime = currentTime - this.lastTime;
+                this.lastTime = currentTime;
+                
+                // Calculate FPS
+                this.frameCount++;
+                if (currentTime - this.lastFpsTime >= 1000) {
+                    this.fps = this.frameCount;
+                    this.frameCount = 0;
+                    this.lastFpsTime = currentTime;
+                }
+                
+                this.update(currentTime, deltaTime);
+                this.render(currentTime);
+                
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+            
+            update(currentTime, deltaTime) {
+                for (const drop of this.drops) {
+                    drop.update(currentTime, deltaTime);
+                }
+            }
+            
+            render(currentTime) {
+                // Clear with trailing effect
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Render drops
+                const color = this.settings.color.replace('#', '');
+                for (const drop of this.drops) {
+                    drop.render(this.ctx, color, currentTime);
+                }
+            }
+            
+            updateDisplay() {
+                // Reinitialize drops with new settings
+                this.initializeDrops();
+            }
+            
+            exitScreenSaver() {
+                this.stop();
+                
+                // Notify Electron main process
+                if (typeof window.electronAPI !== 'undefined') {
+                    window.electronAPI.stopScreenSaver();
+                } else {
+                    // Fallback for testing
+                    window.close();
+                }
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                new ElectronMatrixScreenSaver();
+            });
+        } else {
+            new ElectronMatrixScreenSaver();
+        }
+    </script>
+</body>
+</html>

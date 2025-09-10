@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Rain Screen Saver - Settings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="settings-page">
+    <div class="container">
+        <header class="app-header">
+            <h1>Matrix Digital Rain</h1>
+            <p>Desktop Screen Saver Settings</p>
+        </header>
+
+        <main class="settings-main">
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <button id="start-screensaver" class="action-btn primary">
+                    <span class="btn-icon">▶</span>
+                    Start Screen Saver
+                </button>
+                <button id="stop-screensaver" class="action-btn secondary" disabled>
+                    <span class="btn-icon">⏹</span>
+                    Stop Screen Saver
+                </button>
+                <button id="preview-screensaver" class="action-btn">
+                    <span class="btn-icon">👁</span>
+                    Preview
+                </button>
+            </section>
+
+            <!-- Settings Form -->
+            <form id="settings-form" class="settings-form">
+                <!-- Visual Settings -->
+                <fieldset class="settings-group">
+                    <legend>Visual Settings</legend>
+                    
+                    <div class="setting-row">
+                        <label for="color-picker">Rain Color:</label>
+                        <div class="color-input-group">
+                            <input type="color" id="color-picker" name="color" value="#00ff00">
+                            <select id="color-presets" name="colorPreset">
+                                <option value="#00ff00">Classic Green</option>
+                                <option value="#0066ff">Blue</option>
+                                <option value="#ff0000">Red</option>
+                                <option value="#ffff00">Yellow</option>
+                                <option value="#00ffff">Cyan</option>
+                                <option value="#ff00ff">Purple</option>
+                                <option value="#ff9900">Orange</option>
+                                <option value="#ff69b4">Pink</option>
+                                <option value="#ffffff">White</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <label for="font-size">Font Size:</label>
+                        <div class="slider-group">
+                            <input type="range" id="font-size" name="fontSize" min="10" max="32" step="2" value="16">
+                            <span class="slider-value" id="font-size-value">16px</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <label for="speed">Animation Speed:</label>
+                        <div class="slider-group">
+                            <input type="range" id="speed" name="speed" min="50" max="500" step="25" value="100">
+                            <span class="slider-value" id="speed-value">Normal</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <label for="opacity">Opacity:</label>
+                        <div class="slider-group">
+                            <input type="range" id="opacity" name="opacity" min="0.05" max="1.0" step="0.05" value="0.1">
+                            <span class="slider-value" id="opacity-value">10%</span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Display Settings -->
+                <fieldset class="settings-group">
+                    <legend>Display Settings</legend>
+                    
+                    <div class="setting-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="multi-display" name="multiDisplay" checked>
+                            <span class="checkmark"></span>
+                            Multi-Display Support
+                        </label>
+                        <small>Show screen saver on all connected displays</small>
+                    </div>
+
+                    <div class="setting-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="fullscreen" name="fullscreen" checked>
+                            <span class="checkmark"></span>
+                            Full Screen Mode
+                        </label>
+                        <small>Run in true fullscreen (recommended)</small>
+                    </div>
+
+                    <div class="setting-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="prevent-sleep" name="preventSleep" checked>
+                            <span class="checkmark"></span>
+                            Prevent Sleep
+                        </label>
+                        <small>Keep displays active while screen saver is running</small>
+                    </div>
+                </fieldset>
+
+                <!-- Behavior Settings -->
+                <fieldset class="settings-group">
+                    <legend>Behavior Settings</legend>
+                    
+                    <div class="setting-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="exit-on-activity" name="exitOnActivity" checked>
+                            <span class="checkmark"></span>
+                            Exit on Activity
+                        </label>
+                        <small>Stop screen saver when mouse or keyboard activity detected</small>
+                    </div>
+
+                    <div class="setting-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="start-with-system" name="startWithSystem">
+                            <span class="checkmark"></span>
+                            Start with System
+                        </label>
+                        <small>Launch Matrix Rain when the computer starts</small>
+                    </div>
+                </fieldset>
+            </form>
+
+            <!-- Display Information -->
+            <section class="display-info">
+                <h3>Connected Displays</h3>
+                <div id="displays-list" class="displays-grid">
+                    <!-- Dynamically populated -->
+                </div>
+            </section>
+
+            <!-- System Information -->
+            <section class="system-info">
+                <h3>System Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Platform:</label>
+                        <span id="platform">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Electron:</label>
+                        <span id="electron-version">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Status:</label>
+                        <span id="screensaver-status" class="status-inactive">Inactive</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Memory Usage:</label>
+                        <span id="memory-usage">Loading...</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <div class="footer-actions">
+                <button id="minimize-to-tray" class="footer-btn">Minimize to Tray</button>
+                <button id="quit-app" class="footer-btn">Quit Application</button>
+            </div>
+            <div class="footer-info">
+                <p>Matrix Digital Rain Screen Saver v1.0</p>
+                <p>Built with Electron • <a href="#" id="about-link">About</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Screen Saver Preview</h3>
+                <button class="modal-close" id="close-preview">&times;</button>
+            </div>
+            <div class="modal-body">
+                <canvas id="preview-canvas"></canvas>
+            </div>
+            <div class="modal-footer">
+                <p>Press Escape or click outside to close preview</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>About Matrix Rain Screen Saver</h3>
+                <button class="modal-close" id="close-about">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="about-content">
+                    <h4>Matrix Digital Rain Screen Saver</h4>
+                    <p>Version 1.0.0</p>
+                    <p>A beautiful Matrix-style digital rain screen saver for desktop computers, featuring authentic Greek characters and customizable visual effects.</p>
+                    
+                    <h5>Features:</h5>
+                    <ul>
+                        <li>Multi-display support</li>
+                        <li>Customizable colors and effects</li>
+                        <li>Greek and Latin character sets</li>
+                        <li>Smooth 60fps animation</li>
+                        <li>System integration</li>
+                    </ul>
+                    
+                    <h5>Keyboard Shortcuts:</h5>
+                    <ul>
+                        <li><kbd>Ctrl+Alt+M</kbd> - Start/Stop screen saver</li>
+                        <li><kbd>Ctrl+Alt+S</kbd> - Show settings</li>
+                        <li><kbd>Ctrl+Alt+Esc</kbd> - Force stop screen saver</li>
+                    </ul>
+                    
+                    <p class="copyright">Created by Vincent Lee • Open Source MIT License</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+# Makefile for SceneKit GPU-Accelerated Screen Saver
+
+TARGET = aimatrix
+BUNDLE_NAME = aimatrix-fresh-1757364935.saver
+SWIFT_SOURCES = AIMatrixSceneKitView.swift
+OBJC_SOURCES = AIMatrixView-Swift.m
+INSTALL_DIR = ~/Library/Screen\ Savers
+CODESIGN_IDENTITY = "Apple Development: VINCENT LEE (5GKJMFZD6T)"
+
+CC_FLAGS = -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -O2 -fobjc-arc
+SWIFT_FLAGS = -O -whole-module-optimization
+
+all: $(BUNDLE_NAME)
+
+$(BUNDLE_NAME): $(SWIFT_SOURCES) $(OBJC_SOURCES) Info-Swift.plist
+	@echo "Building SceneKit GPU-Accelerated Screen Saver..."
+	@mkdir -p $(BUNDLE_NAME)/Contents/MacOS
+	@mkdir -p $(BUNDLE_NAME)/Contents/Resources
+	
+	# Compile Swift to object file
+	swiftc $(SWIFT_FLAGS) \
+		-emit-object \
+		-emit-module \
+		-module-name $(TARGET) \
+		-import-objc-header bridging-header.h \
+		-o $(BUNDLE_NAME)/Contents/MacOS/$(TARGET).o \
+		$(SWIFT_SOURCES)
+	
+	# Compile Objective-C bridge
+	clang $(CC_FLAGS) \
+		-c -o $(BUNDLE_NAME)/Contents/MacOS/bridge.o \
+		$(OBJC_SOURCES)
+	
+	# Link everything into a bundle
+	clang $(CC_FLAGS) \
+		-bundle \
+		-o $(BUNDLE_NAME)/Contents/MacOS/$(TARGET) \
+		-framework ScreenSaver \
+		-framework Cocoa \
+		-framework SceneKit \
+		-framework QuartzCore \
+		-framework Metal \
+		-L/usr/lib/swift \
+		-Xlinker -rpath -Xlinker /usr/lib/swift \
+		$(BUNDLE_NAME)/Contents/MacOS/$(TARGET).o \
+		$(BUNDLE_NAME)/Contents/MacOS/bridge.o
+	
+	# Clean up object files
+	@rm -f $(BUNDLE_NAME)/Contents/MacOS/*.o
+	
+	# Copy Info.plist
+	cp Info-Swift.plist $(BUNDLE_NAME)/Contents/Info.plist
+	
+	# Copy thumbnail images if they exist
+	@if [ -f thumbnail.png ]; then cp thumbnail.png $(BUNDLE_NAME)/Contents/Resources/; fi
+	@if [ -f thumbnail@2x.png ]; then cp thumbnail@2x.png $(BUNDLE_NAME)/Contents/Resources/; fi
+	
+	# Sign the bundle
+	codesign --force --deep --strict --verbose \
+		--sign $(CODESIGN_IDENTITY) \
+		--entitlements ScreenSaver.entitlements \
+		--options runtime \
+		--timestamp \
+		$(BUNDLE_NAME)
+	
+	@echo "SceneKit screen saver built successfully: $(BUNDLE_NAME)"
+
+install: $(BUNDLE_NAME)
+	@echo "Installing to $(INSTALL_DIR)..."
+	@mkdir -p $(INSTALL_DIR)
+	@echo "Cleaning up previous versions..."
+	@rm -rf $(INSTALL_DIR)/aimatrix-v*.saver
+	@cp -r $(BUNDLE_NAME) $(INSTALL_DIR)/
+	@echo "Installation complete!"
+	@echo "Please restart System Settings and select 'AIMatrix Independent V9'"
+
+clean:
+	@rm -rf $(BUNDLE_NAME)
+	@echo "Cleaned build artifacts"
+
+.PHONY: all install clean

@@ -1,7 +1,7 @@
 # Makefile for Digital Rain Screen Saver (merged from NewMakefile)
 
 TARGET = aimatrix
-BUNDLE_NAME = aimatrix-v5.24.saver
+BUNDLE_NAME = aimatrix-fixed-1757365272.saver
 SOURCES = AIMatrixView.m
 INSTALL_DIR = ~/Library/Screen\ Savers
 CODESIGN_IDENTITY = "Apple Development: VINCENT LEE (5GKJMFZD6T)"
@@ -21,6 +21,7 @@ $(BUNDLE_NAME): $(SOURCES) NewInfo.plist
 		-o $(BUNDLE_NAME)/Contents/MacOS/$(TARGET) \
 		-framework ScreenSaver \
 		-framework Cocoa \
+		-framework QuartzCore \
 		$(SOURCES)
 	
 	# Copy Info.plist
@@ -50,7 +51,7 @@ install: $(BUNDLE_NAME)
 	@cp -r $(BUNDLE_NAME) $(INSTALL_DIR)/
 	@echo "Installation complete!"
 	@echo "If System Settings is open, please quit it and reopen after install."
-	@echo "Go to System Settings > Screen Saver and pick 'aimatrix v5.24'"
+	@echo "Go to System Settings > Screen Saver and pick 'aimatrix v5.41'"
 
 uninstall:
 	@echo "Removing installed aimatrix screen savers..."
@@ -60,6 +61,67 @@ uninstall:
 
 clean:
 	@rm -rf $(BUNDLE_NAME)
+	@rm -rf *.saver
 	@echo "Cleaned build artifacts"
 
-.PHONY: all install uninstall clean
+# Test screen savers for debugging
+ForceDrawTest.saver: ForceDrawTest.m ForceDrawTest.plist
+	@echo "Building ForceDrawTest..."
+	@mkdir -p ForceDrawTest.saver/Contents/MacOS
+	@mkdir -p ForceDrawTest.saver/Contents/Resources
+	clang $(CC_FLAGS) -bundle -o ForceDrawTest.saver/Contents/MacOS/ForceDrawTest \
+		-framework ScreenSaver -framework Cocoa ForceDrawTest.m
+	cp ForceDrawTest.plist ForceDrawTest.saver/Contents/Info.plist
+	codesign --force --deep --strict --verbose \
+		--sign $(CODESIGN_IDENTITY) \
+		--entitlements ScreenSaver.entitlements \
+		--options runtime \
+		--timestamp \
+		ForceDrawTest.saver
+	@echo "ForceDrawTest.saver built"
+
+TestFall.saver: TestFall.m
+	@echo "Building TestFall..."
+	@mkdir -p TestFall.saver/Contents/MacOS
+	@mkdir -p TestFall.saver/Contents/Resources
+	clang $(CC_FLAGS) -bundle -o TestFall.saver/Contents/MacOS/TestFall \
+		-framework ScreenSaver -framework Cocoa TestFall.m
+	@echo '<?xml version="1.0" encoding="UTF-8"?>' > TestFall.saver/Contents/Info.plist
+	@echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> TestFall.saver/Contents/Info.plist
+	@echo '<plist version="1.0"><dict>' >> TestFall.saver/Contents/Info.plist
+	@echo '<key>CFBundleIdentifier</key><string>com.test.testfall</string>' >> TestFall.saver/Contents/Info.plist
+	@echo '<key>CFBundleName</key><string>TestFall</string>' >> TestFall.saver/Contents/Info.plist
+	@echo '<key>NSPrincipalClass</key><string>TestFall</string>' >> TestFall.saver/Contents/Info.plist
+	@echo '</dict></plist>' >> TestFall.saver/Contents/Info.plist
+	codesign --force --deep --strict --verbose \
+		--sign $(CODESIGN_IDENTITY) \
+		--entitlements ScreenSaver.entitlements \
+		--options runtime \
+		--timestamp \
+		TestFall.saver
+	@echo "TestFall.saver built"
+
+MetalMatrix.saver: MetalMatrixView.m MetalMatrix.plist
+	@echo "Building MetalMatrix..."
+	@mkdir -p MetalMatrix.saver/Contents/MacOS
+	@mkdir -p MetalMatrix.saver/Contents/Resources
+	clang $(CC_FLAGS) -bundle -o MetalMatrix.saver/Contents/MacOS/MetalMatrix \
+		-framework ScreenSaver -framework Cocoa -framework Metal -framework MetalKit \
+		MetalMatrixView.m
+	cp MetalMatrix.plist MetalMatrix.saver/Contents/Info.plist
+	codesign --force --deep --strict --verbose \
+		--sign $(CODESIGN_IDENTITY) \
+		--entitlements ScreenSaver.entitlements \
+		--options runtime \
+		--timestamp \
+		MetalMatrix.saver
+	@echo "MetalMatrix.saver built"
+
+install-test: ForceDrawTest.saver TestFall.saver MetalMatrix.saver
+	@echo "Installing test screen savers..."
+	@cp -r ForceDrawTest.saver $(INSTALL_DIR)/
+	@cp -r TestFall.saver $(INSTALL_DIR)/
+	@cp -r MetalMatrix.saver $(INSTALL_DIR)/
+	@echo "Test screen savers installed"
+
+.PHONY: all install uninstall clean install-test

@@ -1,0 +1,172 @@
+{
+  "name": "Matrix Digital Rain Screen Saver",
+  "short_name": "Matrix Rain",
+  "description": "A beautiful Matrix-style digital rain screen saver featuring authentic Greek characters and customizable visual effects.",
+  "version": "1.0.0",
+  "start_url": "/",
+  "scope": "/",
+  "display": "fullscreen",
+  "orientation": "any",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "lang": "en",
+  "dir": "ltr",
+  
+  "icons": [
+    {
+      "src": "assets/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "categories": [
+    "entertainment",
+    "graphics",
+    "utilities"
+  ],
+  
+  "screenshots": [
+    {
+      "src": "assets/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Matrix rain in fullscreen mode"
+    },
+    {
+      "src": "assets/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Matrix rain on mobile device"
+    }
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Start Screen Saver",
+      "short_name": "Start",
+      "description": "Launch the Matrix rain screen saver in fullscreen mode",
+      "url": "/?start=true",
+      "icons": [
+        {
+          "src": "assets/icon-play-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Configure Matrix rain visual effects and behavior",
+      "url": "/?settings=true",
+      "icons": [
+        {
+          "src": "assets/icon-settings-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "related_applications": [
+    {
+      "platform": "web",
+      "url": "https://github.com/aimatrix/amx-aimatrix-screen-saver"
+    }
+  ],
+  
+  "features": [
+    "Cross-browser compatibility",
+    "Multi-display support",
+    "Customizable colors and effects",
+    "Greek and Latin character sets",
+    "Performance optimization",
+    "Fullscreen mode",
+    "Keyboard shortcuts",
+    "Mobile responsive"
+  ],
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+matrix",
+      "url": "/?matrix=%s"
+    }
+  ],
+  
+  "handle_links": "preferred",
+  
+  "launch_handler": {
+    "client_mode": "navigate-new"
+  },
+  
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/json": [".json"],
+        "text/plain": [".txt"]
+      },
+      "icons": [
+        {
+          "src": "assets/icon-file-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ],
+      "launch_type": "single-client"
+    }
+  ]
+}

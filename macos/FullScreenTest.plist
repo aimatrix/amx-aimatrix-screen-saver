@@ -5,23 +5,23 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>aimatrix</string>
+	<string>fullscreentest</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aimatrix.fixed.1757365272</string>
+	<string>com.fullscreentest.debug.888888</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>10.0</string>
+	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>AIMatrix</string>
+	<string>FullScreenTest</string>
 	<key>CFBundleDisplayName</key>
-	<string>AIMatrix Fixed Independent</string>
+	<string>FullScreenTest Debug</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>10.0</string>
+	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSPrincipalClass</key>
-	<string>AIMatrixView</string>
+	<string>FullScreenTest</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>11.0</string>
 	<key>CFBundleSupportedPlatforms</key>
