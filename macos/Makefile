@@ -124,4 +124,27 @@ install-test: ForceDrawTest.saver TestFall.saver MetalMatrix.saver
 	@cp -r MetalMatrix.saver $(INSTALL_DIR)/
 	@echo "Test screen savers installed"
 
-.PHONY: all install uninstall clean install-test
+# Variants version
+AIMatrixVariants.saver: AIMatrixVariantsView.m VariantsInfo.plist
+	@echo "Building AIMatrix Variants Screen Saver..."
+	@mkdir -p AIMatrixVariants.saver/Contents/MacOS
+	@mkdir -p AIMatrixVariants.saver/Contents/Resources
+	clang $(CC_FLAGS) -bundle -o AIMatrixVariants.saver/Contents/MacOS/AIMatrixVariants \
+		-framework ScreenSaver -framework Cocoa \
+		AIMatrixVariantsView.m
+	cp VariantsInfo.plist AIMatrixVariants.saver/Contents/Info.plist
+	codesign --force --deep --strict --verbose \
+		--sign $(CODESIGN_IDENTITY) \
+		--entitlements ScreenSaver.entitlements \
+		--options runtime \
+		--timestamp \
+		AIMatrixVariants.saver
+	@echo "AIMatrixVariants.saver built"
+
+install-variants: AIMatrixVariants.saver
+	@echo "Installing AIMatrix Variants..."
+	@cp -r AIMatrixVariants.saver $(INSTALL_DIR)/
+	@echo "AIMatrix Variants installed!"
+	@echo "Go to System Settings > Screen Saver and select 'AIMatrix Variants'"
+
+.PHONY: all install uninstall clean install-test install-variants

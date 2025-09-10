@@ -1,0 +1,74 @@
+// AIMatrix Screen Saver Resources
+
+#include <windows.h>
+#include <scrnsave.h>
+
+// Dialog control IDs
+#define IDC_COLOR_COMBO    1001
+#define IDC_SPEED_COMBO    1002
+#define IDC_DENSITY_COMBO  1003
+#define IDC_SIZE_COMBO     1004
+#define IDC_ABOUT_TEXT     1005
+
+// Configuration Dialog
+DLG_SCRNSAVECONFIGURE DIALOG 0, 0, 250, 180
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "AIMatrix Screen Saver Settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Display Options", -1, 7, 7, 236, 140
+    
+    LTEXT           "Color Scheme:", -1, 20, 25, 60, 8
+    COMBOBOX        IDC_COLOR_COMBO, 85, 23, 140, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    
+    LTEXT           "Speed:", -1, 20, 45, 60, 8
+    COMBOBOX        IDC_SPEED_COMBO, 85, 43, 140, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    
+    LTEXT           "Density:", -1, 20, 65, 60, 8
+    COMBOBOX        IDC_DENSITY_COMBO, 85, 63, 140, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    
+    LTEXT           "Character Size:", -1, 20, 85, 60, 8
+    COMBOBOX        IDC_SIZE_COMBO, 85, 83, 140, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    
+    LTEXT           "AIMatrix Digital Rain Screen Saver v6.0", -1, 20, 110, 200, 8
+    LTEXT           "© 2025 AIMatrix - aimatrix.com", -1, 20, 125, 200, 8
+    
+    DEFPUSHBUTTON   "OK", IDOK, 139, 153, 50, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 193, 153, 50, 14
+END
+
+// String Table
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDS_DESCRIPTION    "AIMatrix Digital Rain Screen Saver"
+END
+
+// Version Information
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION    6,0,0,0
+PRODUCTVERSION 6,0,0,0
+FILEOS         VOS_NT_WINDOWS32
+FILETYPE       VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "AIMatrix\0"
+            VALUE "FileDescription",   "AIMatrix Digital Rain Screen Saver\0"
+            VALUE "FileVersion",       "6.0.0.0\0"
+            VALUE "InternalName",      "AIMatrixScreenSaver\0"
+            VALUE "LegalCopyright",    "© 2025 AIMatrix. All rights reserved.\0"
+            VALUE "OriginalFilename",  "AIMatrixScreenSaver.scr\0"
+            VALUE "ProductName",       "AIMatrix Screen Saver\0"
+            VALUE "ProductVersion",    "6.0.0.0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+// Icon (optional - add your icon here)
+// IDI_MAIN ICON "aimatrix.ico"

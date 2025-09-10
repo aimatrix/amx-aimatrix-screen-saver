@@ -2,133 +2,85 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <style>
-        body {
-            width: 300px;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a1a;
-            color: #00ff00;
-            margin: 0;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        
-        h1 {
-            font-size: 18px;
-            margin: 0 0 20px 0;
-            text-align: center;
-            color: #00ff00;
-        }
-        
-        .setting-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .toggle {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .toggle input[type="checkbox"] {
-            margin-right: 10px;
-            transform: scale(1.2);
-        }
-        
-        input[type="color"] {
-            width: 100%;
-            height: 40px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background: #2a2a2a;
-            cursor: pointer;
-        }
-        
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #333;
-            outline: none;
-            -webkit-appearance: none;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #00ff00;
-            cursor: pointer;
-        }
-        
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #00ff00;
-            cursor: pointer;
-            border: none;
-        }
-        
-        .opacity-value {
-            font-size: 12px;
-            color: #888;
-            text-align: right;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #333;
-            font-size: 12px;
-            color: #666;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AIMatrix Digital Rain Settings</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Matrix Digital Rain</h1>
-    
-    <div class="toggle">
-        <input type="checkbox" id="enableMatrix">
-        <label for="enableMatrix">Enable Matrix Rain</label>
-    </div>
-    
-    <div class="setting-group">
-        <label for="colorPicker">Rain Color:</label>
-        <input type="color" id="colorPicker" value="#00ff00">
-    </div>
-    
-    <div class="setting-group">
-        <label for="fontSizeSlider">Font Size:</label>
-        <input type="range" id="fontSizeSlider" min="10" max="30" step="2" value="16">
-        <div class="opacity-value" id="fontSizeValue">16px</div>
-    </div>
-    
-    <div class="setting-group">
-        <label for="speedSlider">Speed:</label>
-        <input type="range" id="speedSlider" min="50" max="500" step="25" value="100">
-        <div class="opacity-value" id="speedValue">1.0x</div>
-    </div>
-    
-    <div class="setting-group">
-        <label for="opacitySlider">Opacity:</label>
-        <input type="range" id="opacitySlider" min="0.05" max="0.5" step="0.05" value="0.1">
-        <div class="opacity-value" id="opacityValue">10%</div>
-    </div>
-    
-    <div class="footer">
-        Matrix Digital Rain Theme v1.0
+    <div class="popup-container">
+        <header class="header">
+            <h1>AIMatrix Digital Rain</h1>
+            <p class="version">v6.0</p>
+        </header>
+        
+        <div class="toggle-section">
+            <label class="toggle">
+                <input type="checkbox" id="enableMatrix">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Enable Matrix Rain</span>
+            </label>
+        </div>
+        
+        <div class="settings-section">
+            <div class="setting-group">
+                <label for="colorScheme">Color Scheme:</label>
+                <select id="colorScheme" class="select-input">
+                    <option value="green">Classic Green</option>
+                    <option value="blue">Blue</option>
+                    <option value="red">Red</option>
+                    <option value="yellow">Yellow</option>
+                    <option value="cyan">Cyan</option>
+                    <option value="purple">Purple</option>
+                    <option value="orange">Orange</option>
+                    <option value="pink">Pink</option>
+                    <option value="custom">Custom Color</option>
+                </select>
+            </div>
+            
+            <div class="setting-group" id="customColorGroup" style="display: none;">
+                <label for="customColor">Custom Color:</label>
+                <input type="color" id="customColor" value="#00ff00" class="color-input">
+            </div>
+            
+            <div class="setting-group">
+                <label for="speedSetting">Speed:</label>
+                <select id="speedSetting" class="select-input">
+                    <option value="slow">Slow</option>
+                    <option value="normal">Normal</option>
+                    <option value="fast">Fast</option>
+                    <option value="veryfast">Very Fast</option>
+                </select>
+            </div>
+            
+            <div class="setting-group">
+                <label for="densitySetting">Density:</label>
+                <select id="densitySetting" class="select-input">
+                    <option value="sparse">Sparse</option>
+                    <option value="normal">Normal</option>
+                    <option value="dense">Dense</option>
+                </select>
+            </div>
+            
+            <div class="setting-group">
+                <label for="characterSize">Character Size:</label>
+                <select id="characterSize" class="select-input">
+                    <option value="small">Small (12px)</option>
+                    <option value="medium">Medium (16px)</option>
+                    <option value="large">Large (20px)</option>
+                    <option value="extralarge">Extra Large (24px)</option>
+                </select>
+            </div>
+            
+            <div class="setting-group">
+                <label for="opacitySlider">Opacity: <span id="opacityValue">30%</span></label>
+                <input type="range" id="opacitySlider" min="0.1" max="0.8" step="0.05" value="0.3" class="range-input">
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p>AIMatrix Digital Rain Screen Saver</p>
+            <p><a href="https://aimatrix.com" target="_blank">aimatrix.com</a></p>
+        </footer>
     </div>
     
     <script src="popup.js"></script>
