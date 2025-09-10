@@ -17,8 +17,8 @@
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview {
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
-        // 60 FPS for smooth animation
-        [self setAnimationTimeInterval:1.0/60.0];
+        // 30 FPS for smooth animation (60 FPS can be too fast and cause jerkiness)
+        [self setAnimationTimeInterval:1.0/30.0];
         
         // Font setup
         matrixFont = [NSFont fontWithName:@"Menlo" size:14];
@@ -36,9 +36,10 @@
         for (int i = 0; i < numColumns; i++) {
             NSMutableDictionary *column = [NSMutableDictionary dictionary];
             column[@"x"] = @(i * columnWidth);
-            column[@"y"] = @(-arc4random_uniform(500)); // Start above the screen
+            // Use float for smoother animation
+            column[@"y"] = @((float)-arc4random_uniform(500)); // Start above the screen
             column[@"length"] = @(5 + arc4random_uniform(20));
-            column[@"speed"] = @(50 + arc4random_uniform(100)); // pixels per second
+            column[@"speed"] = @(30.0f + (float)(arc4random_uniform(50))); // pixels per second, slower for smoothness
             column[@"lastUpdate"] = @(CACurrentMediaTime());
             column[@"chars"] = [self generateRandomChars:[column[@"length"] intValue]];
             [columns addObject:column];
@@ -49,7 +50,7 @@
 
 - (NSMutableArray *)generateRandomChars:(int)length {
     NSMutableArray *chars = [NSMutableArray array];
-    NSString *text = @"aimatrix.com - the agentic twin platform ";
+    NSString *text = @"aimatrix.com - the agentic twin platform.... ";
     
     // Fill the array with characters from the text, repeating as needed
     for (int i = 0; i < length; i++) {
@@ -60,6 +61,10 @@
 }
 
 - (void)drawRect:(NSRect)rect {
+    // Enable anti-aliasing for smoother text
+    NSGraphicsContext *context = [NSGraphicsContext currentContext];
+    [context setShouldAntialias:YES];
+    
     // Black background
     [[NSColor blackColor] setFill];
     NSRectFill(rect);
@@ -73,8 +78,8 @@
         
         // Draw characters in the column
         for (int i = 0; i < length; i++) {
-            // Calculate position (trail extends downward behind head)
-            float charY = y + (i * charHeight);
+            // Calculate position (trail extends downward behind head) - use float for smooth rendering
+            float charY = y + ((float)i * (float)charHeight);
             
             // Skip if off screen
             if (charY < -charHeight || charY > rect.size.height) continue;
@@ -113,14 +118,15 @@
         float y = [column[@"y"] floatValue];
         float speed = [column[@"speed"] floatValue];
         
-        // Move down smoothly based on time
-        y += speed * deltaTime;
+        // Move down smoothly based on time with interpolation
+        float movement = speed * (float)deltaTime;
+        y += movement;
         
         // Reset when the head goes off screen at the bottom
         if (y > self.bounds.size.height) {
-            y = -arc4random_uniform(500);
+            y = (float)-arc4random_uniform(500);
             column[@"length"] = @(5 + arc4random_uniform(20));
-            column[@"speed"] = @(50 + arc4random_uniform(100));
+            column[@"speed"] = @(30.0f + (float)(arc4random_uniform(50)));
             column[@"chars"] = [self generateRandomChars:[column[@"length"] intValue]];
         }
         

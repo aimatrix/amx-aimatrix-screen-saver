@@ -7,19 +7,19 @@
 	<key>CFBundleExecutable</key>
 	<string>aimatrix</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aimatrix.v7</string>
+	<string>com.aimatrix.v71</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>10.0</string>
 	<key>CFBundleName</key>
-	<string>aimatrix-v7.0</string>
+	<string>aimatrix-v7.1</string>
 	<key>CFBundleDisplayName</key>
-	<string>aimatrix-v7.0</string>
+	<string>aimatrix-v7.1</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>7.0</string>
+	<string>7.1</string>
 	<key>CFBundleVersion</key>
-	<string>7.0</string>
+	<string>7.1</string>
 	<key>NSPrincipalClass</key>
 	<string>AIMatrixView</string>
 	<key>LSMinimumSystemVersion</key>
