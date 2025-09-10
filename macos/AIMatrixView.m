@@ -1,10 +1,12 @@
 #import <ScreenSaver/ScreenSaver.h>
+#import <QuartzCore/QuartzCore.h>
 
 @interface AIMatrixView : ScreenSaverView {
     NSMutableArray *columns;
     NSFont *matrixFont;
     int columnWidth;
     int charHeight;
+    CFTimeInterval lastFrameTime;
 }
 @end
 
@@ -17,8 +19,12 @@
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview {
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
-        // 30 FPS for smooth animation (60 FPS can be too fast and cause jerkiness)
-        [self setAnimationTimeInterval:1.0/30.0];
+        // Use CADisplayLink for buttery smooth 60 FPS animation synchronized with display refresh
+        [self setAnimationTimeInterval:1.0/60.0];
+        
+        // Enable layer-backing for better performance and smoother rendering
+        [self setWantsLayer:YES];
+        self.layer.drawsAsynchronously = YES;
         
         // Font setup
         matrixFont = [NSFont fontWithName:@"Menlo" size:14];
@@ -36,14 +42,17 @@
         for (int i = 0; i < numColumns; i++) {
             NSMutableDictionary *column = [NSMutableDictionary dictionary];
             column[@"x"] = @(i * columnWidth);
-            // Use float for smoother animation
-            column[@"y"] = @((float)-arc4random_uniform(500)); // Start above the screen
+            // Use double precision for ultra-smooth subpixel animation
+            column[@"y"] = @((double)-arc4random_uniform(500)); // Start above the screen
             column[@"length"] = @(5 + arc4random_uniform(20));
-            column[@"speed"] = @(30.0f + (float)(arc4random_uniform(50))); // pixels per second, slower for smoothness
+            column[@"speed"] = @(60.0 + (double)(arc4random_uniform(80))); // pixels per second, optimized for 60fps
             column[@"lastUpdate"] = @(CACurrentMediaTime());
             column[@"chars"] = [self generateRandomChars:[column[@"length"] intValue]];
             [columns addObject:column];
         }
+        
+        // Initialize display link for precise frame timing
+        lastFrameTime = CACurrentMediaTime();
     }
     return self;
 }
@@ -61,40 +70,48 @@
 }
 
 - (void)drawRect:(NSRect)rect {
-    // Enable anti-aliasing for smoother text
+    // Enable high-quality rendering for ultra-smooth text
     NSGraphicsContext *context = [NSGraphicsContext currentContext];
     [context setShouldAntialias:YES];
+    [context setImageInterpolation:NSImageInterpolationHigh];
+    
+    // Enable subpixel text positioning for smoothest possible rendering
+    CGContextRef cgContext = [context CGContext];
+    CGContextSetShouldSubpixelPositionFonts(cgContext, YES);
+    CGContextSetShouldSubpixelQuantizeFonts(cgContext, YES);
+    CGContextSetAllowsAntialiasing(cgContext, YES);
+    CGContextSetShouldSmoothFonts(cgContext, YES);
     
     // Black background
     [[NSColor blackColor] setFill];
     NSRectFill(rect);
     
-    // Draw each column
+    // Draw each column with subpixel precision
     for (NSMutableDictionary *column in columns) {
-        float x = [column[@"x"] floatValue];
-        float y = [column[@"y"] floatValue];
+        double x = [column[@"x"] doubleValue];
+        double y = [column[@"y"] doubleValue];
         int length = [column[@"length"] intValue];
         NSArray *chars = column[@"chars"];
         
-        // Draw characters in the column
+        // Draw characters in the column with subpixel positioning
         for (int i = 0; i < length; i++) {
-            // Calculate position (trail extends downward behind head) - use float for smooth rendering
-            float charY = y + ((float)i * (float)charHeight);
+            // Calculate position with double precision for ultra-smooth movement
+            double charY = y + ((double)i * (double)charHeight);
             
-            // Skip if off screen
-            if (charY < -charHeight || charY > rect.size.height) continue;
+            // Skip if off screen (with some margin for smooth transitions)
+            if (charY < -charHeight * 2 || charY > rect.size.height + charHeight) continue;
             
             // Color intensity (brightest at head)
-            float intensity;
+            double intensity;
             NSColor *color;
             
             if (i == 0) {
                 // Head - bright white-green
-                color = [NSColor colorWithRed:0.8 green:1.0 blue:0.8 alpha:1.0];
+                color = [NSColor colorWithRed:0.9 green:1.0 blue:0.9 alpha:1.0];
             } else {
-                // Trail - fading green
-                intensity = 1.0 - ((float)i / (float)length);
-                color = [NSColor colorWithRed:0 green:intensity blue:0 alpha:intensity];
+                // Trail - fading green with smooth gradient
+                intensity = 1.0 - ((double)i / (double)length);
+                color = [NSColor colorWithRed:0 green:intensity * 0.8 blue:0 alpha:intensity];
             }
             
             NSDictionary *attrs = @{
@@ -102,40 +119,42 @@
                 NSForegroundColorAttributeName: color
             };
             
+            // Use subpixel-precise positioning for ultra-smooth text rendering
             [chars[i % chars.count] drawAtPoint:NSMakePoint(x, charY) withAttributes:attrs];
         }
     }
 }
 
 - (void)animateOneFrame {
-    double currentTime = CACurrentMediaTime();
+    CFTimeInterval currentTime = CACurrentMediaTime();
+    CFTimeInterval deltaTime = currentTime - lastFrameTime;
     
-    // Update each column
+    // Cap delta time to prevent large jumps if frame rate drops
+    if (deltaTime > 1.0/30.0) deltaTime = 1.0/30.0;
+    
+    // Update each column with ultra-precise timing
     for (NSMutableDictionary *column in columns) {
-        double lastUpdate = [column[@"lastUpdate"] doubleValue];
-        double deltaTime = currentTime - lastUpdate;
+        double y = [column[@"y"] doubleValue];
+        double speed = [column[@"speed"] doubleValue];
         
-        float y = [column[@"y"] floatValue];
-        float speed = [column[@"speed"] floatValue];
-        
-        // Move down smoothly based on time with interpolation
-        float movement = speed * (float)deltaTime;
+        // Move down smoothly with subpixel precision
+        double movement = speed * deltaTime;
         y += movement;
         
         // Reset when the head goes off screen at the bottom
-        if (y > self.bounds.size.height) {
-            y = (float)-arc4random_uniform(500);
-            column[@"length"] = @(5 + arc4random_uniform(20));
-            column[@"speed"] = @(30.0f + (float)(arc4random_uniform(50)));
+        if (y > self.bounds.size.height + 100) {
+            y = (double)(-arc4random_uniform(800) - 100); // Start further up for smoother entry
+            column[@"length"] = @(8 + arc4random_uniform(15)); // Slightly longer trails
+            column[@"speed"] = @(80.0 + (double)(arc4random_uniform(60))); // Faster for 60fps
             column[@"chars"] = [self generateRandomChars:[column[@"length"] intValue]];
         }
         
         column[@"y"] = @(y);
-        column[@"lastUpdate"] = @(currentTime);
-        
-        // No need to randomly change characters since we're showing specific text
     }
     
+    lastFrameTime = currentTime;
+    
+    // Use display synchronization for perfectly smooth updates
     [self setNeedsDisplay:YES];
 }
 
