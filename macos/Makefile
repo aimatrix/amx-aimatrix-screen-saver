@@ -1,7 +1,8 @@
 # Makefile for Digital Rain Screen Saver (merged from NewMakefile)
 
 TARGET = aimatrix
-BUNDLE_NAME = aimatrix-fixed-1757365272.saver
+VERSION = 7.0
+BUNDLE_NAME = aimatrix-v$(VERSION).saver
 SOURCES = AIMatrixView.m
 INSTALL_DIR = ~/Library/Screen\ Savers
 CODESIGN_IDENTITY = "Apple Development: VINCENT LEE (5GKJMFZD6T)"
@@ -44,14 +45,15 @@ $(BUNDLE_NAME): $(SOURCES) NewInfo.plist
 install: $(BUNDLE_NAME)
 	@echo "Installing to $(INSTALL_DIR)..."
 	@mkdir -p $(INSTALL_DIR)
-	@echo "Cleaning up previous aimatrix versions..."
-	@rm -rf $(INSTALL_DIR)/aimatrix-v*.saver
-	@rm -rf /Library/Screen\ Savers/aimatrix-v*.saver || true
-	@rm -rf $(INSTALL_DIR)/$(BUNDLE_NAME)
+	@echo "Cleaning up ALL previous versions..."
+	@rm -rf $(INSTALL_DIR)/aimatrix*.saver
+	@rm -rf $(INSTALL_DIR)/AIMatrix*.saver
+	@rm -rf /Library/Screen\ Savers/aimatrix*.saver || true
+	@rm -rf /Library/Screen\ Savers/AIMatrix*.saver || true
 	@cp -r $(BUNDLE_NAME) $(INSTALL_DIR)/
 	@echo "Installation complete!"
 	@echo "If System Settings is open, please quit it and reopen after install."
-	@echo "Go to System Settings > Screen Saver and pick 'aimatrix v5.41'"
+	@echo "Go to System Settings > Screen Saver and pick 'aimatrix-v$(VERSION)'"
 
 uninstall:
 	@echo "Removing installed aimatrix screen savers..."

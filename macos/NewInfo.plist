@@ -7,13 +7,13 @@
 	<key>CFBundleExecutable</key>
 	<string>aimatrix</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aimatrix.fixed.1757365272</string>
+	<string>com.aimatrix.v7</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>10.0</string>
 	<key>CFBundleName</key>
-	<string>AIMatrix</string>
+	<string>aimatrix-v7.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>AIMatrix - Agentic Twin Platform</string>
+	<string>aimatrix-v7.0</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
