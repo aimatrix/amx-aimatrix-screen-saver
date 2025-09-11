@@ -1,9 +1,9 @@
 # Makefile for Digital Rain Screen Saver (merged from NewMakefile)
 
 TARGET = aimatrix
-VERSION = 7.3
+VERSION = 7.7
 BUNDLE_NAME = aimatrix-v$(VERSION).saver
-SOURCES = AIMatrixView.m
+SOURCES = AIMatrixView.m AIMatrixConfig.m
 
 # GPU Version 8.0 Configuration
 GPU_TARGET = aimatrix-gpu
@@ -32,7 +32,8 @@ $(BUNDLE_NAME): $(SOURCES) NewInfo.plist
 		-o $(BUNDLE_NAME)/Contents/MacOS/$(TARGET) \
 		-framework ScreenSaver \
 		-framework Cocoa \
-		-framework QuartzCore \
+		-framework OpenGL \
+		-framework GLUT \
 		$(SOURCES)
 	
 	# Copy Info.plist

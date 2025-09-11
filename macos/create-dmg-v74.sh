@@ -3,7 +3,7 @@
 # Create DMG installer for AIMatrix Screen Saver v7.3
 set -e
 
-VERSION="7.3"
+VERSION="7.4"
 DMG_NAME="aimatrix-v${VERSION}.dmg"
 TEMP_DIR="aimatrix-v${VERSION}-installer"
 VOLUME_NAME="AIMatrix v${VERSION}"
@@ -36,7 +36,7 @@ cat > "$TEMP_DIR/install.command" << 'EOF'
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-VERSION="7.3"
+VERSION="7.4"
 SAVER_NAME="aimatrix-v${VERSION}.saver"
 INSTALL_DIR="$HOME/Library/Screen Savers"
 
