@@ -1,165 +1,155 @@
 #import <ScreenSaver/ScreenSaver.h>
 #import <QuartzCore/QuartzCore.h>
 
+@interface TextStream : NSObject
+@property (nonatomic, strong) CATextLayer *textLayer;
+@property (nonatomic, assign) CGFloat speed;
+@property (nonatomic, assign) CGFloat currentY;
+@end
+
+@implementation TextStream
+@end
+
 @interface AIMatrixView : ScreenSaverView {
-    NSMutableArray *columns;
+    NSString *displayText;
+    NSMutableArray *textStreams;
     NSFont *matrixFont;
-    int columnWidth;
-    int charHeight;
     CFTimeInterval lastFrameTime;
+    CGFloat textHeight;
+    CGFloat textWidth;
 }
 @end
 
 @implementation AIMatrixView
 
-- (BOOL)isFlipped {
-    return YES;  // Top-left origin
-}
-
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview {
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
-        // Use CADisplayLink for buttery smooth 60 FPS animation synchronized with display refresh
-        [self setAnimationTimeInterval:1.0/60.0];
-        
-        // Enable layer-backing for better performance and smoother rendering
+        // Enable layer-backing for GPU acceleration
         [self setWantsLayer:YES];
-        self.layer.drawsAsynchronously = YES;
+        self.layer.backgroundColor = [[NSColor blackColor] CGColor];
+        
+        // Turn off automatic animations for better control
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        
+        // Initialize display text
+        displayText = @"aimatrix.com - the agentic twin platform.... ";
         
         // Font setup
-        matrixFont = [NSFont fontWithName:@"Menlo" size:14];
+        matrixFont = [NSFont fontWithName:@"Menlo-Bold" size:18];
         if (!matrixFont) {
-            matrixFont = [NSFont monospacedSystemFontOfSize:14 weight:NSFontWeightMedium];
+            matrixFont = [NSFont monospacedSystemFontOfSize:18 weight:NSFontWeightBold];
         }
         
-        columnWidth = 10;
-        charHeight = 16;
+        // Calculate text dimensions
+        NSDictionary *attrs = @{NSFontAttributeName: matrixFont};
+        NSSize textSize = [displayText sizeWithAttributes:attrs];
+        textWidth = textSize.width;
+        textHeight = textSize.height;
         
-        // Initialize columns
-        columns = [NSMutableArray array];
-        int numColumns = frame.size.width / columnWidth;
+        textStreams = [NSMutableArray array];
         
-        for (int i = 0; i < numColumns; i++) {
-            NSMutableDictionary *column = [NSMutableDictionary dictionary];
-            column[@"x"] = @(i * columnWidth);
-            // Use double precision for ultra-smooth subpixel animation
-            column[@"y"] = @((double)-arc4random_uniform(500)); // Start above the screen
-            column[@"length"] = @(5 + arc4random_uniform(20));
-            column[@"speed"] = @(60.0 + (double)(arc4random_uniform(80))); // pixels per second, optimized for 60fps
-            column[@"lastUpdate"] = @(CACurrentMediaTime());
-            column[@"chars"] = [self generateRandomChars:[column[@"length"] intValue]];
-            [columns addObject:column];
+        // Create text streams distributed across the screen
+        int numColumns = 8;
+        CGFloat columnSpacing = frame.size.width / numColumns;
+        
+        for (int col = 0; col < numColumns; col++) {
+            // Create multiple streams per column
+            for (int i = 0; i < 5; i++) {
+                TextStream *stream = [[TextStream alloc] init];
+                
+                // Create CATextLayer for GPU-accelerated text rendering
+                CATextLayer *textLayer = [CATextLayer layer];
+                textLayer.string = displayText;
+                textLayer.fontSize = 18;
+                textLayer.font = (__bridge CFTypeRef)matrixFont;
+                textLayer.foregroundColor = [[NSColor greenColor] CGColor];
+                textLayer.frame = CGRectMake(col * columnSpacing, 
+                                            -(i * 150) - arc4random_uniform(200),
+                                            textWidth, 
+                                            textHeight);
+                textLayer.contentsScale = [[NSScreen mainScreen] backingScaleFactor];
+                textLayer.allowsFontSubpixelQuantization = YES;
+                
+                // Add shadow for glow effect
+                textLayer.shadowColor = [[NSColor greenColor] CGColor];
+                textLayer.shadowOffset = CGSizeMake(0, 0);
+                textLayer.shadowRadius = 3.0;
+                textLayer.shadowOpacity = 0.8;
+                
+                [self.layer addSublayer:textLayer];
+                
+                stream.textLayer = textLayer;
+                stream.speed = 80 + arc4random_uniform(40);
+                stream.currentY = textLayer.frame.origin.y;
+                
+                [textStreams addObject:stream];
+            }
         }
         
-        // Initialize display link for precise frame timing
+        [CATransaction commit];
+        
+        // Use 60 FPS timer
+        [self setAnimationTimeInterval:1.0/60.0];
         lastFrameTime = CACurrentMediaTime();
     }
     return self;
-}
-
-- (NSMutableArray *)generateRandomChars:(int)length {
-    NSMutableArray *chars = [NSMutableArray array];
-    NSString *text = @"aimatrix.com - the agentic twin platform.... ";
-    
-    // Fill the array with characters from the text, repeating as needed
-    for (int i = 0; i < length; i++) {
-        unichar c = [text characterAtIndex:(i % text.length)];
-        [chars addObject:[NSString stringWithCharacters:&c length:1]];
-    }
-    return chars;
-}
-
-- (void)drawRect:(NSRect)rect {
-    // Enable high-quality rendering for ultra-smooth text
-    NSGraphicsContext *context = [NSGraphicsContext currentContext];
-    [context setShouldAntialias:YES];
-    [context setImageInterpolation:NSImageInterpolationHigh];
-    
-    // Enable subpixel text positioning for smoothest possible rendering
-    CGContextRef cgContext = [context CGContext];
-    CGContextSetShouldSubpixelPositionFonts(cgContext, YES);
-    CGContextSetShouldSubpixelQuantizeFonts(cgContext, YES);
-    CGContextSetAllowsAntialiasing(cgContext, YES);
-    CGContextSetShouldSmoothFonts(cgContext, YES);
-    
-    // Black background
-    [[NSColor blackColor] setFill];
-    NSRectFill(rect);
-    
-    // Draw each column with subpixel precision
-    for (NSMutableDictionary *column in columns) {
-        double x = [column[@"x"] doubleValue];
-        double y = [column[@"y"] doubleValue];
-        int length = [column[@"length"] intValue];
-        NSArray *chars = column[@"chars"];
-        
-        // Draw characters in the column with subpixel positioning
-        for (int i = 0; i < length; i++) {
-            // Calculate position with double precision for ultra-smooth movement
-            double charY = y + ((double)i * (double)charHeight);
-            
-            // Skip if off screen (with some margin for smooth transitions)
-            if (charY < -charHeight * 2 || charY > rect.size.height + charHeight) continue;
-            
-            // Color intensity (brightest at head)
-            double intensity;
-            NSColor *color;
-            
-            if (i == 0) {
-                // Head - bright white-green
-                color = [NSColor colorWithRed:0.9 green:1.0 blue:0.9 alpha:1.0];
-            } else {
-                // Trail - fading green with smooth gradient
-                intensity = 1.0 - ((double)i / (double)length);
-                color = [NSColor colorWithRed:0 green:intensity * 0.8 blue:0 alpha:intensity];
-            }
-            
-            NSDictionary *attrs = @{
-                NSFontAttributeName: matrixFont,
-                NSForegroundColorAttributeName: color
-            };
-            
-            // Use subpixel-precise positioning for ultra-smooth text rendering
-            [chars[i % chars.count] drawAtPoint:NSMakePoint(x, charY) withAttributes:attrs];
-        }
-    }
 }
 
 - (void)animateOneFrame {
     CFTimeInterval currentTime = CACurrentMediaTime();
     CFTimeInterval deltaTime = currentTime - lastFrameTime;
     
-    // Cap delta time to prevent large jumps if frame rate drops
     if (deltaTime > 1.0/30.0) deltaTime = 1.0/30.0;
     
-    // Update each column with ultra-precise timing
-    for (NSMutableDictionary *column in columns) {
-        double y = [column[@"y"] doubleValue];
-        double speed = [column[@"speed"] doubleValue];
+    // Disable implicit animations for smooth updates
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    
+    for (TextStream *stream in textStreams) {
+        // Update position
+        stream.currentY += stream.speed * deltaTime;
         
-        // Move down smoothly with subpixel precision
-        double movement = speed * deltaTime;
-        y += movement;
-        
-        // Reset when the head goes off screen at the bottom
-        if (y > self.bounds.size.height + 100) {
-            y = (double)(-arc4random_uniform(800) - 100); // Start further up for smoother entry
-            column[@"length"] = @(8 + arc4random_uniform(15)); // Slightly longer trails
-            column[@"speed"] = @(80.0 + (double)(arc4random_uniform(60))); // Faster for 60fps
-            column[@"chars"] = [self generateRandomChars:[column[@"length"] intValue]];
+        // Reset if off screen
+        if (stream.currentY > self.bounds.size.height) {
+            stream.currentY = -textHeight - arc4random_uniform(300);
+            CGFloat newX = arc4random_uniform(self.bounds.size.width - textWidth);
+            stream.textLayer.frame = CGRectMake(newX, stream.currentY, textWidth, textHeight);
+            stream.speed = 80 + arc4random_uniform(40);
+            
+            // Vary the green color slightly
+            CGFloat greenValue = 0.7 + (arc4random_uniform(30) / 100.0);
+            stream.textLayer.foregroundColor = [[NSColor colorWithRed:0 green:greenValue blue:0 alpha:1.0] CGColor];
+            stream.textLayer.shadowColor = [[NSColor colorWithRed:0 green:greenValue blue:0 alpha:1.0] CGColor];
+        } else {
+            // Just update Y position
+            CGRect frame = stream.textLayer.frame;
+            frame.origin.y = stream.currentY;
+            stream.textLayer.frame = frame;
         }
         
-        column[@"y"] = @(y);
+        // Fade based on position
+        CGFloat fadeStart = self.bounds.size.height * 0.7;
+        if (stream.currentY > fadeStart) {
+            CGFloat fadeAmount = 1.0 - ((stream.currentY - fadeStart) / (self.bounds.size.height * 0.3));
+            stream.textLayer.opacity = fadeAmount;
+        } else {
+            stream.textLayer.opacity = 1.0;
+        }
     }
     
-    lastFrameTime = currentTime;
+    [CATransaction commit];
     
-    // Use display synchronization for perfectly smooth updates
-    [self setNeedsDisplay:YES];
+    lastFrameTime = currentTime;
 }
 
-- (BOOL)hasConfigureSheet { 
-    return YES; 
+- (void)drawRect:(NSRect)rect {
+    // Background is handled by layer, no need to draw
+}
+
+- (BOOL)hasConfigureSheet {
+    return YES;
 }
 
 - (NSWindow *)configureSheet {
@@ -171,7 +161,7 @@
     NSView *contentView = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 400, 200)];
     
     NSTextField *label = [[NSTextField alloc] initWithFrame:NSMakeRect(50, 100, 300, 40)];
-    [label setStringValue:@"AIMatrix Screen Saver\nDigital Rain Effect"];
+    [label setStringValue:@"AIMatrix Screen Saver\nGPU-Accelerated Digital Rain"];
     [label setBezeled:NO];
     [label setDrawsBackground:NO];
     [label setEditable:NO];
