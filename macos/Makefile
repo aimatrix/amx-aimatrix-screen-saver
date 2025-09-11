@@ -1,7 +1,7 @@
 # Makefile for Digital Rain Screen Saver (merged from NewMakefile)
 
 TARGET = aimatrix
-VERSION = 7.2
+VERSION = 7.3
 BUNDLE_NAME = aimatrix-v$(VERSION).saver
 SOURCES = AIMatrixView.m
 
